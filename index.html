@@ -26,6 +26,7 @@ async function load() {
   let zoom = parseInt(initialZoom || '2', 10);
   let q = params.get('q');
   let markers = params.getAll('marker');
+  let radius = params.get('radius');
   let map = L.map('map', { zoomControl: false }).setView(toPoint(center), zoom);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -55,11 +56,23 @@ async function load() {
     markers.forEach(s => u.append('marker', s));
     u.append('center', `${center.lat},${center.lng}`);
     u.append('zoom', newZoom);
+    if (radius) {
+      u.append('radius', radius);
+    }
     history.replaceState(null, null, '?' + u.toString());
   });
   markers.forEach(s => {
     L.marker(toPoint(s)).addTo(map);
   });
+  if (radius) {
+    let center = map.getCenter();
+    L.circle([center.lat,center.lng], {
+      color: 'orange',
+      fillColor: '#f03',
+      fillOpacity: 0.2,
+      radius: radius
+    }).addTo(map);
+  }
 }
 load();
 </script>
